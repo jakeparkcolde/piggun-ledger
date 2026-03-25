@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 
 // 금액 포맷
 const fmt = (n) => (n == null || isNaN(n)) ? '0' : Math.round(n).toLocaleString('ko-KR');
@@ -717,6 +717,108 @@ const DataMgr = ({ s, set }) => {
   );
 };
 
+// ========== AI 챗봇 ==========
+const ChatBot = () => {
+  const [open, setOpen] = useState(false);
+  const [msgs, setMsgs] = useState([
+    { role: 'assistant', content: '안녕하세요! 피그건 세무장부 도우미입니다. 앱 사용법이나 세무 관련 궁금한 점을 물어보세요!' }
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs]);
+
+  const send = async () => {
+    if (!input.trim() || loading) return;
+    const userMsg = { role: 'user', content: input.trim() };
+    const newMsgs = [...msgs, userMsg];
+    setMsgs(newMsgs);
+    setInput('');
+    setLoading(true);
+
+    try {
+      // API 메시지 형식 (첫 번째 안내 메시지 제외)
+      const apiMsgs = newMsgs.filter((_, i) => i > 0).map(m => ({ role: m.role, content: m.content }));
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: apiMsgs }),
+      });
+      const data = await res.json();
+      if (data.reply) {
+        setMsgs(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      } else {
+        setMsgs(prev => [...prev, { role: 'assistant', content: '죄송합니다, 오류가 발생했어요. 잠시 후 다시 시도해주세요.' }]);
+      }
+    } catch {
+      setMsgs(prev => [...prev, { role: 'assistant', content: '네트워크 오류가 발생했어요. 인터넷 연결을 확인해주세요.' }]);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <>
+      {/* 플로팅 버튼 */}
+      <button onClick={() => setOpen(!open)}
+        className="fixed bottom-6 right-6 w-14 h-14 bg-pink-500 text-white rounded-full shadow-lg hover:bg-pink-600 transition z-50 flex items-center justify-center text-2xl">
+        {open ? '✕' : '💬'}
+      </button>
+
+      {/* 채팅 창 */}
+      {open && (
+        <div className="fixed bottom-24 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex flex-col" style={{ maxHeight: '70vh' }}>
+          {/* 헤더 */}
+          <div className="bg-gradient-to-r from-pink-500 to-pink-400 text-white px-4 py-3 rounded-t-2xl flex items-center gap-2">
+            <span className="text-xl">🐷</span>
+            <div>
+              <p className="font-bold text-sm">피그건 세무 도우미</p>
+              <p className="text-xs text-pink-100">앱 사용법 + 세무 지식 안내</p>
+            </div>
+          </div>
+
+          {/* 메시지 영역 */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ minHeight: '200px', maxHeight: '50vh' }}>
+            {msgs.map((m, i) => (
+              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap ${
+                  m.role === 'user'
+                    ? 'bg-pink-500 text-white rounded-br-md'
+                    : 'bg-gray-100 text-gray-800 rounded-bl-md'
+                }`}>
+                  {m.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 text-gray-500 px-3 py-2 rounded-2xl rounded-bl-md text-sm">
+                  입력 중...
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+
+          {/* 입력 영역 */}
+          <div className="border-t p-3 flex gap-2">
+            <input type="text" value={input} onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && send()}
+              placeholder="질문을 입력하세요..."
+              className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
+            <button onClick={send} disabled={loading || !input.trim()}
+              className="bg-pink-500 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-pink-600 disabled:opacity-50 transition text-sm">
+              ↑
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
 // ========== 메인 앱 ==========
 const App = () => {
   const [s, set] = useState(INIT);
@@ -804,6 +906,9 @@ const App = () => {
           피그건 간편 세무장부 v1.0 | 참고용이며, 정확한 세무 신고는 세무사와 상담하세요.
         </div>
       </footer>
+
+      {/* AI 챗봇 */}
+      <ChatBot />
     </div>
   );
 };
