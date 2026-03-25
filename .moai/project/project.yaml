@@ -1,0 +1,13 @@
+project:
+  name: simple-account
+  description: 소상공인을 위한 간편 세무장부
+  version: 0.1.0
+  status: planning
+  type: web_application
+  tech_stack:
+    - React (JSX)
+    - Tailwind CSS
+    - recharts
+    - lucide-react
+  data_strategy: json_export_import
+  target_user: 김영규 (피그건 대표)
