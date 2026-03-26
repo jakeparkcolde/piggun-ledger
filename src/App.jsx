@@ -717,6 +717,210 @@ const DataMgr = ({ s, set }) => {
   );
 };
 
+// ========== 도움말 ==========
+const HelpGuide = () => {
+  const [openFaq, setOpenFaq] = useState(null);
+  const toggleFaq = (i) => setOpenFaq(openFaq === i ? null : i);
+
+  const faqs = [
+    { q: '데이터가 날아갔어요 😱', a: '전에 "JSON 내보내기"한 파일이 있으면 "JSON 가져오기"로 복원할 수 있어요. 없으면 다시 입력해야 합니다. 그래서 매번 저장이 중요해요!' },
+    { q: '법인이랑 개인 파일을 따로 만들어야 하나요?', a: '아뇨! 하나의 파일에 법인과 개인 데이터가 다 들어 있어요. 탭만 전환하면 각각 따로 관리됩니다.' },
+    { q: '"희망 납부세액"을 얼마로 넣어야 해요?', a: '정답은 없어요! 매달 편하게 감당할 수 있는 금액을 넣으면 됩니다. 세무사님이랑 상의해서 1년 목표를 정하고 12로 나누는 것도 좋은 방법이에요.' },
+    { q: '고정비가 바뀌었는데 전부 다시 넣어야 해요?', a: '아뇨! 기본값을 바꾸면 앞으로 모든 달에 적용돼요. 특정 달만 다르게 하고 싶으면 "월 고정비 조정"으로 그 달만 수정하면 됩니다.' },
+    { q: '에어소프트건을 장비로 잡아도 괜찮아요?', a: '체험 서비스용으로 쓰는 건 "장비"로 볼 수 있어요. 다만 판매용 재고와 구분해야 해요. 꼭 세무사님과 상의하세요!' },
+    { q: '당근페이 수수료도 비용에 넣어요?', a: '네! 당근페이 수수료(8% 미만)는 비용으로 인정되고 부가세 공제도 돼요. 근데 당근으로 산 물건 자체는 개인 거래라서 공제 안 돼요.' },
+    { q: '스마트폰으로도 쓸 수 있어요?', a: '네! 폰 브라우저로 접속하면 돼요. 홈 화면에 추가하면 앱처럼 쓸 수 있어요.' },
+  ];
+
+  const SectionTitle = ({ num, title }) => (
+    <div className="mb-4">
+      <span className="text-xs font-bold text-[#059669]">{num}</span>
+      <h3 className="text-xl font-bold text-[#111827] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{title}</h3>
+    </div>
+  );
+
+  const StepItem = ({ num, title, desc }) => (
+    <div className="flex items-start gap-3 bg-white rounded-2xl p-4 mb-2">
+      <span className="w-8 h-8 rounded-full bg-[#059669] text-white flex items-center justify-center text-sm font-bold shrink-0">{num}</span>
+      <div>
+        <p className="font-bold text-sm text-[#111827]">{title}</p>
+        <p className="text-xs text-[#6B7280] mt-0.5">{desc}</p>
+      </div>
+    </div>
+  );
+
+  const TipBox = ({ color, icon, title, children }) => {
+    const colors = {
+      green: 'bg-[#ECFDF5] border-l-4 border-[#059669]',
+      yellow: 'bg-[#FFFBEB] border-l-4 border-[#F59E0B]',
+      red: 'bg-[#FEF2F2] border-l-4 border-[#EF4444]',
+    };
+    return (
+      <div className={`${colors[color]} rounded-r-2xl p-4 mb-4`}>
+        <p className="font-bold text-sm">{icon} {title}</p>
+        <div className="text-xs text-[#6B7280] mt-1">{children}</div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* 이게 뭐야? */}
+      <Card>
+        <SectionTitle num="01" title="이게 뭐야? 한 줄 요약" />
+        <div className="bg-[#F9FAFB] rounded-2xl p-4 mb-4">
+          <p className="text-sm">보통 장부: <strong>"번 돈 - 쓴 돈 = 남은 돈 → 세금 계산"</strong></p>
+          <p className="text-center text-lg my-2">⬇️</p>
+          <p className="text-sm text-[#059669] font-bold">피그건 장부: <strong>"세금 이만큼만 내고 싶다 → 비용이 얼마나 더 필요한지 알려줄게!"</strong></p>
+        </div>
+        <div className="bg-[#ECFDF5] rounded-2xl p-4">
+          <p className="text-sm">🐷 <strong>"이번 달 2천만 원 팔았는데, 세금 30만 원만 내고 싶어!"</strong></p>
+          <p className="text-xs text-[#6B7280] mt-1">→ 비용 증빙이 얼마나 더 필요한지 바로 보여줍니다.</p>
+        </div>
+      </Card>
+
+      {/* 화면 구조 */}
+      <Card>
+        <SectionTitle num="02" title="화면은 이렇게 생겼어요" />
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="bg-[#ECFDF5] rounded-2xl p-4 text-center">
+            <p className="text-lg">🏢</p>
+            <p className="font-bold text-sm text-[#059669]">법인</p>
+            <p className="text-xs text-[#6B7280] mt-1">에어소프트건 체험 + 중고 매매</p>
+            <p className="text-[10px] text-[#9CA3AF] mt-1">메뉴 7개</p>
+          </div>
+          <div className="bg-[#F9FAFB] rounded-2xl p-4 text-center">
+            <p className="text-lg">☕</p>
+            <p className="font-bold text-sm text-[#111827]">개인사업자</p>
+            <p className="text-xs text-[#6B7280] mt-1">카페 운영 (커피/음료)</p>
+            <p className="text-[10px] text-[#9CA3AF] mt-1">메뉴 5개</p>
+          </div>
+        </div>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center gap-2 bg-white rounded-xl p-3"><span>📊</span><span><strong>대시보드</strong> — 이번 달 요약 한눈에</span></div>
+          <div className="flex items-center gap-2 bg-white rounded-xl p-3"><span>📝</span><span><strong>월별입력</strong> — 매출/비용 입력</span></div>
+          <div className="flex items-center gap-2 bg-white rounded-xl p-3"><span>🔫</span><span><strong>중고매입</strong> — 당근/중고나라 매입 기록 <span className="text-[10px] bg-[#ECFDF5] text-[#059669] px-1.5 py-0.5 rounded font-medium">법인만</span></span></div>
+          <div className="flex items-center gap-2 bg-white rounded-xl p-3"><span>⚙️</span><span><strong>고정비</strong> — 매달 같은 비용 설정</span></div>
+          <div className="flex items-center gap-2 bg-white rounded-xl p-3"><span>🏗️</span><span><strong>감가상각</strong> — 비싼 장비 나눠서 비용 처리 <span className="text-[10px] bg-[#ECFDF5] text-[#059669] px-1.5 py-0.5 rounded font-medium">법인만</span></span></div>
+          <div className="flex items-center gap-2 bg-white rounded-xl p-3"><span>💰</span><span><strong>부가세</strong> — 분기별 부가세 미리 계산</span></div>
+          <div className="flex items-center gap-2 bg-white rounded-xl p-3"><span>📤</span><span><strong>데이터</strong> — 저장/불러오기</span></div>
+        </div>
+      </Card>
+
+      {/* 역산 시뮬레이션 */}
+      <Card>
+        <SectionTitle num="03" title="⭐ 역산 시뮬레이션 (핵심!)" />
+        <StepItem num="1" title='"이달 내고 싶은 세금" 칸에 숫자 입력' desc="예: 30만 원 → 300000 입력" />
+        <StepItem num="2" title="장부가 알아서 계산" desc='"30만 원만 내려면, 비용이 총 1,550만 원 필요해!"' />
+        <StepItem num="3" title="부족분 알려줌" desc='"지금 비용은 1,116만 원이고, 433만 원이 더 필요해!"' />
+        <TipBox color="green" icon="💡" title="비용이 부족하면?">
+          <ul className="list-disc ml-4 space-y-1 mt-1">
+            <li><strong>법인카드로 밥/커피/주유</strong> → 다 비용 됨!</li>
+            <li><strong>대표 상여금(보너스)</strong>으로 비용 채우기</li>
+            <li><strong>사무용품/소모품</strong> 살 거 있으면 이번 달에 사기</li>
+          </ul>
+        </TipBox>
+      </Card>
+
+      {/* 부가세 공제 */}
+      <Card>
+        <SectionTitle num="04" title="부가세 공제 가이드" />
+        <TipBox color="green" icon="✅" title="공제 가능 (세금 깎아줌)">
+          <p>임대료, 원재료, 사업자매입, 접대비, 차량유지비, 광고비, 사무용품, 통신비, 소모품, 수도전기, 직원식대</p>
+        </TipBox>
+        <TipBox color="red" icon="❌" title="공제 불가 (세금 안 깎아줌)">
+          <p>급여, 4대보험, 개인한테 산 중고, 현금매입(영수증 없음), 감가상각비, 보험료, 상여금</p>
+        </TipBox>
+        <TipBox color="yellow" icon="⚠️" title="중고 개인매입이 많으면?">
+          <p>부가세를 더 많이 내야 해요. 가능하면 사업자한테 사서 세금계산서 받으세요!</p>
+        </TipBox>
+      </Card>
+
+      {/* 데이터 저장 */}
+      <Card>
+        <SectionTitle num="05" title="🚨 데이터 저장 — 제일 중요!" />
+        <TipBox color="red" icon="🚨" title="이 앱은 자동 저장 안 돼요!">
+          <p className="font-bold text-[#EF4444]">작업 끝나면 반드시 "데이터 → JSON 내보내기"를 눌러서 파일 저장하세요!</p>
+        </TipBox>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="bg-white rounded-2xl p-4">
+            <p className="font-bold text-sm mb-2">📥 저장하기</p>
+            <p className="text-xs text-[#6B7280]">1. 데이터 메뉴 클릭</p>
+            <p className="text-xs text-[#6B7280]">2. JSON 내보내기 클릭</p>
+            <p className="text-xs text-[#6B7280]">3. 파일 자동 다운로드!</p>
+          </div>
+          <div className="bg-white rounded-2xl p-4">
+            <p className="font-bold text-sm mb-2">📤 불러오기</p>
+            <p className="text-xs text-[#6B7280]">1. 데이터 메뉴 클릭</p>
+            <p className="text-xs text-[#6B7280]">2. JSON 가져오기 클릭</p>
+            <p className="text-xs text-[#6B7280]">3. 저장한 파일 선택</p>
+          </div>
+        </div>
+        <TipBox color="green" icon="💡" title="파일 보관 꿀팁">
+          <ul className="list-disc ml-4 space-y-1 mt-1">
+            <li>카카오톡 나에게 보내기 — 가장 간편!</li>
+            <li>구글 드라이브 / 네이버 클라우드에 올려두기</li>
+            <li>세무사에게 이메일로 보내면 세금 신고 활용 가능!</li>
+          </ul>
+        </TipBox>
+      </Card>
+
+      {/* 월간 루틴 */}
+      <Card>
+        <SectionTitle num="06" title="🗓️ 매달 이렇게 하세요 — 10분이면 끝!" />
+        <div className="space-y-0 ml-4 border-l-2 border-[#ECFDF5]">
+          {[
+            { n: '1', t: '카드 전표 확인', d: '카드단말기 이번 달 합계 확인', time: '2분' },
+            { n: '2', t: '월별입력 → 매출 넣기', d: '법인·개인 각각 카드/현금 매출 입력', time: '2분' },
+            { n: '3', t: '월별입력 → 변동비 넣기', d: '접대비, 차량유지비 등 입력 (고정비는 자동!)', time: '3분' },
+            { n: '4', t: '중고매입 기록 (법인만)', d: '당근/중고나라 매입 등록', time: '2분' },
+            { n: '5', t: '대시보드 → 역산 확인', d: '희망 세액 넣고, 부족분 확인, 적립액 이체!', time: '1분' },
+          ].map((item, i) => (
+            <div key={i} className="flex gap-3 items-start pl-4 pb-4 relative">
+              <span className="w-6 h-6 rounded-full bg-[#059669] text-white flex items-center justify-center text-[10px] font-bold absolute -left-[13px] top-0">{item.n}</span>
+              <div className="ml-2">
+                <p className="font-bold text-sm">{item.t} <span className="text-[#9CA3AF] font-normal text-xs">{item.time}</span></p>
+                <p className="text-xs text-[#6B7280]">{item.d}</p>
+              </div>
+            </div>
+          ))}
+          <div className="flex gap-3 items-start pl-4 relative">
+            <span className="w-6 h-6 rounded-full bg-[#EF4444] text-white flex items-center justify-center text-[10px] font-bold absolute -left-[13px] top-0">!</span>
+            <div className="ml-2">
+              <p className="font-bold text-sm text-[#EF4444]">데이터 → JSON 내보내기!!! <span className="text-[#9CA3AF] font-normal text-xs">10초</span></p>
+              <p className="text-xs text-[#6B7280]">이거 안 하면 다 날아가요. 꼭!!!</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* FAQ */}
+      <Card>
+        <SectionTitle num="07" title="❓ 자주 하는 질문" />
+        <div className="space-y-2">
+          {faqs.map((faq, i) => (
+            <div key={i} className="bg-white rounded-2xl overflow-hidden">
+              <button onClick={() => toggleFaq(i)} className="w-full flex justify-between items-center p-4 text-left">
+                <span className="font-medium text-sm">Q. {faq.q}</span>
+                <span className={`text-[#9CA3AF] text-xs transition-transform ${openFaq === i ? 'rotate-180' : ''}`}>▼</span>
+              </button>
+              {openFaq === i && (
+                <p className="px-4 pb-4 text-xs text-[#6B7280]">{faq.a}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* 푸터 */}
+      <div className="text-center text-xs text-[#9CA3AF] py-4">
+        <p>이 장부는 세무 참고용입니다. 실제 세금 신고는 꼭 세무사님과 상의하세요!</p>
+        <p className="mt-1">앱 주소: piggun-ledger.vercel.app</p>
+      </div>
+    </div>
+  );
+};
+
 // ========== AI 챗봇 ==========
 const ChatBot = () => {
   const [open, setOpen] = useState(false);
@@ -824,8 +1028,8 @@ const App = () => {
   const [s, set] = useState(INIT);
   const corp = s.tab === '법인';
   const sections = corp
-    ? ['대시보드', '월별입력', '중고매입', '고정비', '감가상각', '부가세', '데이터']
-    : ['대시보드', '월별입력', '고정비', '부가세', '데이터'];
+    ? ['대시보드', '월별입력', '중고매입', '고정비', '감가상각', '부가세', '데이터', '도움말']
+    : ['대시보드', '월별입력', '고정비', '부가세', '데이터', '도움말'];
 
   const switchTab = (tab) => {
     const secs = tab === '법인'
@@ -843,6 +1047,7 @@ const App = () => {
       case '감가상각': return corp ? <DepreciationMgr s={s} set={set} /> : null;
       case '부가세': return <VATSim s={s} />;
       case '데이터': return <DataMgr s={s} set={set} />;
+      case '도움말': return <HelpGuide />;
       default: return <Dashboard s={s} set={set} />;
     }
   };
